@@ -10,7 +10,7 @@ import { cookies } from 'next/headers';
 export interface User {
   id: number;
   email: string;
-  userName: string;
+  username: string;
   nome: string;
 }
 
