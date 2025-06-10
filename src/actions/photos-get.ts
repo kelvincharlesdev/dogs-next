@@ -1,5 +1,8 @@
 'use server';
 
+import { PHOTOS_GET } from '@/functions/api';
+import { apiError } from '@/functions/api-error';
+
 export interface PhotoProps {
   id: number;
   author: string;
@@ -12,11 +15,33 @@ export interface PhotoProps {
   total_comments: string;
 }
 
-export const photosGet = async () => {
-  const response = await fetch(
-    'https://dogsapi.origamid.dev/json/api/photo/?_page=1&_total=6&_user=0',
-  );
+interface PhotosGetParams {
+  page?: number;
+  total?: number;
+  user?: 0 | string;
+}
 
-  const data = (await response.json()) as PhotoProps[];
-  return data;
+export const photosGet = async (
+  { page = 1, total = 6, user = 0 }: PhotosGetParams = {},
+  optionsFront?: RequestInit,
+) => {
+  try {
+    const options = optionsFront || {
+      next: {
+        revalidate: 10,
+        tags: ['photos'],
+      },
+    };
+    const { url } = PHOTOS_GET({ page, total, user });
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`Erro ao pegar as fotos`);
+    }
+
+    const data = (await response.json()) as PhotoProps[];
+    return { data, ok: true, error: '' };
+  } catch (error) {
+    return apiError(error);
+  }
 };
