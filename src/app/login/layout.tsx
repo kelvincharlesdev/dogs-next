@@ -1,4 +1,4 @@
-import styles from './Login.module.css';
+import styles from './login.module.css';
 
 interface LoginLayoutProps {
   children: React.ReactNode;
